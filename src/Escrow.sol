@@ -34,8 +34,8 @@ contract Escrow {
     // 3: Deal, arb
     // 4: Undo, dst
     // 5: Undo, arb
-    uint8   public how; 
-    bytes32 public wut;
+    uint8   public how;  // state
+    bytes32 public wut;  // contract memo
     address public src;  // Puts gems into escrow
     address public dst;  // Receives gems from escrow
     address public arb;  // arbitrator
@@ -63,12 +63,16 @@ contract Escrow {
         Update(how);
     }
 
-    function sign() {
+    function sign()
+    {
+        require(how == 0);
+        require(msg.sender == src)
         gem.pull(msg.sender, wad);
         how = 1;
         Update(how);
     }
     function deal() {
+        require(how == 1);
         if (msg.sender == src) {
             how = 2;
         } else if (msg.sender == arb) {
@@ -80,6 +84,7 @@ contract Escrow {
         Update(how);
     }
     function bail() {
+        require(how == 1);
         if (msg.sender == dst) {
             how = 4;   
         } else if (msg.sender == arb) {
