@@ -4,14 +4,26 @@ import 'ds-token/token.sol';
 
 contract EscrowFactory {
     mapping(address=>bool) isEscrow;
-    function make( bytes32 wut_
+    event NewEscrow( address indexed src
+                   , address indexed dst
+                   , address indexed arb
+                   , DSToken indexed gem
+                   , Escrow          out
+                   ) anonymous;
+    function make( bytes32 wut
                  , address src
                  , address dst
                  , address arb
                  , DSToken gem
                  , uint256 wad
                  )
-        returns (Escrow);
+        returns (Escrow)
+    {
+        var e = new Escrow(wut, src, dst, arb, gem, wad);
+        isEscrow[e] = true;
+        NewEscrow(src, dst, arb, gem, e);
+        return e;
+    }
 }
 
 contract Escrow {
